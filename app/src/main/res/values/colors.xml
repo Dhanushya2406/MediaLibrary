@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="green">#24A19C</color>
+    <color name="grey">#EFF5F9</color>
+    <color name="light_black">#1B1C1F</color>
+    <color name="light_grey">#767E8C</color>
+    <color name="box_grey">#DDDBE3</color>
+    <color name="blue">#00A3FF</color>
+    <color name="folder_card_bgColor">#F0F8FF</color>
+    <color name="bottom_dialog_bg">#006DAA</color>
+    <color name="bottom_dialog_edittext_box_bg">#0096EA</color>
+    <color name="close_button_bg">#FFA18C</color>
+
+
+</resources>

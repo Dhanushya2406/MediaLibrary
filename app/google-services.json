@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "214992165482",
+    "project_id": "medialibrarytask",
+    "storage_bucket": "medialibrarytask.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214992165482:android:2ae130d1d7940b00d14813",
+        "android_client_info": {
+          "package_name": "com.dhanu.medialibrarytask"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5X06M6f27y_a8Sp02trgX-iw_l7xDtK8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

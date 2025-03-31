@@ -1,0 +1,22 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MediaLibraryTask" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Customize your light theme here. -->
+         <item name="colorPrimary">@color/blue</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="android:statusBarColor">@color/light_grey</item>
+        <item name="android:navigationBarColor">@color/black</item>
+    </style>
+    <style name="ButtonStyleWhite" parent="Widget.Material3.Button">
+        <item name="backgroundTint">#FFFFFF</item>
+        <item name="android:textColor">@color/blue</item> <!-- Ensure text is visible -->
+    </style>
+
+    <style name="CustomDialogTheme" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+
+    <style name="Theme.MediaLibraryTask" parent="Base.Theme.MediaLibraryTask" />
+</resources>
