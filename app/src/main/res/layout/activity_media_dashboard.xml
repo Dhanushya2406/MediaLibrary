@@ -92,6 +92,20 @@
         android:padding="8dp"
         tools:listitem="@layout/recent_card_media_list_item"/>
 
+    <TextView
+        android:id="@+id/noResultsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No results found"
+        android:textAppearance="?attr/textAppearanceBody1"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchLayout"
+        />
+
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="0dp"

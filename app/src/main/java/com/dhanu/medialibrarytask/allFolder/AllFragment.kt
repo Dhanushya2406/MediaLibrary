@@ -216,4 +216,5 @@ class AllFragment : Fragment() {
             else -> "Other"
         }
     }
+
 }
