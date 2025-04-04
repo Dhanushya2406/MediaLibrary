@@ -8,7 +8,7 @@ import androidx.room.Query
 @Dao
 interface FileDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFile(file: FileEntity)
+    suspend fun insertFile(file: FileEntity): Long
 
     @Query("SELECT * FROM files")
     suspend fun getAllFiles(): List<FileEntity>

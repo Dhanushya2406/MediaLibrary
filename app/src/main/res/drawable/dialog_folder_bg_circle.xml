@@ -7,6 +7,6 @@
 
     <!-- Circle Shape -->
     <path
-        android:fillColor="#0096EA"
+        android:fillColor="@color/bottom_dialog_edittext_box_bg"
         android:pathData="M33.5,0 A33.5,33.5 0 1,1 33.5,67 A33.5,33.5 0 1,1 33.5,0 Z" />
 </vector>

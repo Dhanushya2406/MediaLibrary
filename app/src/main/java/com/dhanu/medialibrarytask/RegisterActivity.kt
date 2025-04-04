@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import com.dhanu.medialibrarytask.databinding.ActivityRegisterBinding
 import com.google.firebase.auth.FirebaseAuth
 
@@ -15,6 +16,16 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val sharedPref = getSharedPreferences("AppPrefs", MODE_PRIVATE)
+        val isDarkMode = sharedPref.getBoolean("DARK_MODE", false)
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
+
+
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

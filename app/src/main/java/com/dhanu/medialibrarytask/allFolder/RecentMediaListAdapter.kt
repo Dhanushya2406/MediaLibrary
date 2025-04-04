@@ -17,6 +17,7 @@ class RecentMediaListAdapter(private var mediaList: List<RecentMediaEntity>) :
         val fileName: TextView = itemView.findViewById(R.id.fileName)
     }
 
+    // File type icons mapping
     private val fileTypeIcons = mapOf(
         "image" to R.drawable.ic_file_type_icon,
         "video" to R.drawable.ic_add_new_video_icon,
@@ -31,18 +32,29 @@ class RecentMediaListAdapter(private var mediaList: List<RecentMediaEntity>) :
 
     override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
         val media = mediaList[position]
-
         val decodePath = Uri.decode(media.filePath)
+
         val fileNameWithExt = decodePath.substringAfterLast("/")
-        val fileName = if (fileNameWithExt.contains(".")){
-            fileNameWithExt.substringBeforeLast(".")  // Remove extension if present
-        } else {
-            fileNameWithExt  // Keep name as is if there's no extension
+        // Extract extension & convert to lowercase
+        val fileExtension = fileNameWithExt.substringAfterLast(".", "").lowercase()
+
+        // Determine file type from extension
+        val fileType = when (fileExtension) {
+            "jpg", "jpeg", "png", "gif", "bmp", "webp" -> "image"
+            "mp4", "mkv", "avi", "mov", "flv" -> "video"
+            "mp3", "wav", "aac", "flac" -> "audio"
+            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt" -> "document"
+            else -> "unknown" // Default case
         }
-        holder.fileName.text = fileName
-        holder.fileTypeIcon.setImageResource(fileTypeIcons[media.fileType] ?: R.drawable.ic_add_new_image_icon)
+        holder.fileName.text = fileNameWithExt
+        holder.fileTypeIcon.setImageResource(fileTypeIcons[fileType] ?: R.drawable.ic_add_new_image_icon)
     }
 
     override fun getItemCount(): Int = mediaList.size
+
+    fun updateList(newList: List<RecentMediaEntity>) {
+        mediaList = newList
+        notifyDataSetChanged()
+    }
 
 }

@@ -3,31 +3,52 @@ package com.dhanu.medialibrarytask.filestore
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.webkit.MimeTypeMap
 import com.google.firebase.storage.FirebaseStorage
-import kotlinx.coroutines.CoroutineScope
+import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.io.File
+import kotlinx.coroutines.withContext
+import java.io.IOException
 
 class FirebaseUploader(private val context: Context) {
-    private val storageRef = FirebaseStorage.getInstance().reference
-    private val fileDao = AppDatabase.getDatabase(context).fileDao()
 
-    suspend fun uploadFilesToFirebase() {
-        val files = fileDao.getUnUploadedFiles() // Get files that are not uploaded
-        for (file in files) {
-            val fileUri = Uri.fromFile(File(file.filePath)) // Convert local file to URI
-            val fileRef = storageRef.child("uploads/${fileUri.lastPathSegment}") // Firebase path
+    private val storageReference: StorageReference = FirebaseStorage.getInstance().reference
 
-            fileRef.putFile(fileUri).addOnSuccessListener {
-                fileRef.downloadUrl.addOnSuccessListener { uri ->
-                    CoroutineScope(Dispatchers.IO).launch {
-                        fileDao.updateFileUrl(file.id, uri.toString()) // Update RoomDB with Firebase URL
-                    }
+    suspend fun uploadFilesToFirebase(fileUri: Uri, onSuccess: (String) -> Unit, onFailure: (Exception) -> Unit) {
+        withContext(Dispatchers.IO) {
+            try {
+                // Get file extension dynamically
+                val fileType = getFileExtension(fileUri) ?: "unknown"
+
+                // Check if file exists before uploading
+                context.contentResolver.openInputStream(fileUri)?.use {
+                    val fileRef = storageReference.child("media/${System.currentTimeMillis()}.$fileType")
+
+                    // Start Upload
+                    fileRef.putFile(fileUri)
+                        .addOnSuccessListener { taskSnapshot ->
+                            fileRef.downloadUrl.addOnSuccessListener { uri ->
+                                onSuccess(uri.toString()) // Return Firebase URL
+                            }
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("FirebaseUploader", "Upload failed: ${exception.message}")
+                            onFailure(exception)
+                        }
+                } ?: run {
+                    Log.e("FirebaseUploader", "File does not exist or is inaccessible: $fileUri")
+                    onFailure(IOException("File does not exist"))
                 }
-            }.addOnFailureListener { e ->
-                Log.e("FirebaseUploader", "Upload Failed: ${e.message}")
+            } catch (e: Exception) {
+                Log.e("FirebaseUploader", "Error uploading file: ${e.message}")
+                onFailure(e)
             }
+        }
+    }
+
+    private fun getFileExtension(uri: Uri): String? {
+        return context.contentResolver.getType(uri)?.let { mimeType ->
+            MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
         }
     }
 }

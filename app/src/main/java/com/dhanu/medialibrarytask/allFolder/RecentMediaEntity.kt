@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class RecentMediaEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val filePath: String,
-    val fileType: String,
+    val fileType: String ,
     val fileName: String
 )
 
