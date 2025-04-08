@@ -1,5 +1,6 @@
 package com.dhanu.medialibrarytask.allFolder
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -134,17 +135,64 @@ class AllFragment : Fragment() {
     }
 
     private fun pickFile() {
-        filePickerLauncher.launch("*/*")
+//        filePickerLauncher.launch("*/*")
+        filePickerLauncher.launch(arrayOf("*/*")) // Request all file types
     }
 
-    private val filePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+
+    private val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            saveFileToRoomDB(it) // Save URI directly
-            Toast.makeText(requireContext(), "File saved!", Toast.LENGTH_SHORT).show()
+            requireActivity().contentResolver.takePersistableUriPermission(
+                it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+            saveFileToRoomDB(it) // Save file properly
         } ?: Toast.makeText(requireContext(), "Failed to get file", Toast.LENGTH_SHORT).show()
     }
 
     private fun saveFileToRoomDB(fileUri: Uri) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val insertedId = fileDao.insertFile(FileEntity(filePath = fileUri.toString()))
+
+                if (insertedId > 0) {
+                    Log.d("AllFragment", "File inserted into RoomDB: ID = $insertedId")
+
+                    withContext(Dispatchers.Main) {
+                        loadFilesFromRoomDB() // Refresh UI
+                    }
+
+                    firebaseUploader.uploadFilesToFirebase(
+                        fileUri,
+                        onSuccess = { downloadUrl ->
+                            viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                                fileDao.updateFileUrl(insertedId.toInt(), downloadUrl)
+                                Log.d("AllFragment", "Download URL updated in RoomDB")
+                            }
+                        },
+                        onFailure = { exception ->
+                            Log.e("FirebaseUploader", "Upload failed: ${exception.message}")
+                        }
+                    )
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "Failed to save file!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("AllFragment", "Error saving file: ${e.message}")
+            }
+        }
+    }
+
+
+    /*private val filePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            saveFileToRoomDB(it) // Save URI directly
+            Toast.makeText(requireContext(), "File saved!", Toast.LENGTH_SHORT).show()
+        } ?: Toast.makeText(requireContext(), "Failed to get file", Toast.LENGTH_SHORT).show()
+    }*/
+
+    /*private fun saveFileToRoomDB(fileUri: Uri) {
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             // Insert the file URI into RoomDB first
             val insertedId = fileDao.insertFile(FileEntity(filePath = fileUri.toString()))
@@ -179,7 +227,7 @@ class AllFragment : Fragment() {
                 }
             }
         }
-    }
+    }*/
 
     private fun loadFilesFromRoomDB() {
         lifecycleScope.launch(Dispatchers.IO) {
